@@ -3,8 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 2 — FastAPI serving is implemented.
-MLflow lifecycle, Docker, and CI are still ahead.
+**Current project stage:** Milestone 3 — MLflow tracking and promote/rollback are implemented.
+Docker and CI are still ahead.
 
 ---
 
@@ -124,12 +124,20 @@ Mixing the two without documenting it = interview red flag.
 | `modelops.api.routes` | `/health` `/ready` `/predict` `/model-info` |
 | `modelops.api.app` | Lifespan load; safe error handlers |
 
-### What to learn before Milestone 3
+### What Milestone 3 taught
 
-1. MLflow experiments, runs, and artifacts.
-2. Candidate vs approved / registry aliases.
-3. Quality gates before promotion.
-4. How serving should pin an approved alias, not “whatever was last trained.”
+| Piece | Role |
+|-------|------|
+| `modelops.tracking.mlflow_run` | Experiment setup; log params/metrics/artifacts |
+| `modelops.lifecycle.gates` | Absolute (and optional relative) quality gates |
+| `modelops.lifecycle.promote` | Promote with history; rollback |
+| Serving path order | `MODELOPS_MODEL_PATH` → approved → candidate warning |
+
+### What to learn before Milestone 4
+
+1. Multi-stage Dockerfiles and non-root users.
+2. Why the API image should not contain training data or secrets.
+3. Compose for API (+ optional MLflow UI) locally.
 
 ---
 

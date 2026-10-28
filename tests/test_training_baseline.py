@@ -42,6 +42,7 @@ def test_train_baseline_on_fixture(tmp_path: Path) -> None:
         config=config,
         model_output=model_out,
         metrics_output=metrics_out,
+        log_mlflow=False,
     )
 
     assert model_out.exists()

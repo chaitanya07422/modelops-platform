@@ -13,7 +13,7 @@ This file tracks milestone intent versus what has actually been verified.
 | 0 | Repository foundation | **Done** |
 | 1 | Data ingestion and baseline ML | **Done** |
 | 2 | FastAPI inference service | **Done** |
-| 3 | MLflow and model lifecycle | Planned |
+| 3 | MLflow and model lifecycle | **Done** |
 | 4 | Docker and reproducibility | Planned |
 | 5 | Continuous integration | Planned |
 | 6 | Monitoring and observability | Planned |
@@ -22,14 +22,14 @@ This file tracks milestone intent versus what has actually been verified.
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
-## Milestone 2 checklist
+## Milestone 3 checklist
 
-- [x] `/health`, `/ready`, `/predict`, `/model-info`
-- [x] Pydantic validation and safe error responses
-- [x] Model loaded once at startup; 503 when missing
-- [x] API tests with fixture-trained model
-- [x] Smoke against locally trained candidate
-- [x] API / architecture / local docs updated
+- [x] MLflow params / metrics / artifacts on train
+- [x] Run comparison CLI
+- [x] Quality gates with configurable thresholds
+- [x] Promote + history archive + rollback
+- [x] Docs updated; API prefers approved path
+- [x] Deterministic tests (tmp file store)
 
 ## Rules carried into every milestone
 

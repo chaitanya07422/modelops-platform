@@ -1,7 +1,7 @@
 # Architecture
 
-**Status:** Target design. **Data/training (M1) and FastAPI serving (M2) implemented.**
-MLflow, CI, Docker, and cloud remain planned.
+**Status:** Target design. **M1–M3 implemented** (data, serving, MLflow + promote/rollback).
+Docker, CI, monitoring, and cloud remain planned.
 
 ---
 
@@ -76,8 +76,9 @@ flowchart TB
 1. Download/load raw month (or capped sample) — `python -m modelops.data`.
 2. Validate and build features — `validate_and_clean` / `build_model_frame`.
 3. Time-based split — `time_based_split`.
-4. Fit Ridge pipeline; write candidate joblib + metrics JSON.
-5. *(Planned M3)* Log to MLflow; run quality gate; promote to approved.
+4. Fit Ridge pipeline; evaluate quality gates; write candidate joblib + metrics JSON.
+5. Log params/metrics/artifacts to MLflow (`file:./mlruns`).
+6. `python -m modelops.lifecycle promote` copies gated candidate → approved (+ history).
 
 ### Online inference (Milestone 2 implemented)
 

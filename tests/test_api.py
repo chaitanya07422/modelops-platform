@@ -27,6 +27,7 @@ def trained_paths(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, Path]
         config=config,
         model_output=model_out,
         metrics_output=metrics_out,
+        log_mlflow=False,
     )
     return model_out, metrics_out
 

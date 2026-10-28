@@ -8,8 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 2 (FastAPI inference service) is **complete**.
-> MLflow, Docker, CI, monitoring, and cloud are **not implemented yet**.
+> **Status:** Milestone 3 (MLflow + model lifecycle) is **complete**.
+> Docker, CI, monitoring, and cloud are **not implemented yet**.
 > Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
@@ -36,7 +36,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | Repository layout, tooling, docs skeleton | **Implemented** | 0 |
 | NYC taxi ingestion, validation, baseline ML | **Implemented** | 1 |
 | FastAPI inference service | **Implemented** | 2 |
-| MLflow tracking and model lifecycle | Planned | 3 |
+| MLflow tracking and model lifecycle | **Implemented** | 3 |
 | Docker / Compose | Planned | 4 |
 | GitHub Actions CI | Planned | 5 |
 | Prometheus / Grafana monitoring | Planned | 6 |
@@ -165,12 +165,18 @@ python -m modelops.data                 # download one TLC month
 python -m modelops.training --download-if-missing
 ```
 
-Later extras:
+Install tracking + API extras for the current stack:
 
 ```bash
-python -m pip install -e ".[api]"
-python -m pip install -e ".[tracking]"
+python -m pip install -e ".[dev,ml,api,tracking]"
 # or: python -m pip install -e ".[all]"
+```
+
+```bash
+python -m modelops.training --download-if-missing
+python -m modelops.lifecycle promote
+python -m modelops.api --host 127.0.0.1 --port 8000
+mlflow ui --backend-store-uri ./mlruns
 ```
 
 ---
@@ -237,8 +243,8 @@ approval. Cost and cleanup are covered in
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- No MLflow promotion workflow, Docker, CI, or cloud config yet.
-- Serving may fall back to a local **candidate** model until Milestone 3 promotion.
+- No Docker, CI, or cloud config yet.
+- Candidate→approved promotion is local filesystem + MLflow tracking (not a remote registry server).
 - Predictions are demo estimates, not official TLC quotes.
 
 ---

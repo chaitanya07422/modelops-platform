@@ -95,24 +95,34 @@ Tests use the synthetic fixture only — no TLC download required.
 
 ---
 
-## Prediction API (Milestone 2)
+## MLflow + promotion (Milestone 3)
 
 ```bash
-python -m pip install -e ".[dev,ml,api]"
+python -m pip install -e ".[dev,ml,api,tracking]"
 
-# Point at a trained candidate (or copy/promote to models/approved later)
-export MODELOPS_MODEL_PATH=models/candidates/baseline_linear_regression.joblib
+python -m modelops.training --download-if-missing
+python -m modelops.lifecycle compare --limit 5
+python -m modelops.lifecycle promote
+python -m modelops.lifecycle rollback   # if needed
 
+mlflow ui --backend-store-uri ./mlruns
+```
+
+`mlruns/` is gitignored.
+
+## Prediction API (Milestone 2+)
+
+```bash
+# After promote, API prefers models/approved/model.joblib
 python -m modelops.api --host 127.0.0.1 --port 8000
 # OpenAPI: http://127.0.0.1:8000/docs
 ```
 
-If `MODELOPS_MODEL_PATH` / approved path is missing but the default candidate
-exists, the app logs a warning and uses the candidate for local demos.
+If approved is missing, the app may fall back to the candidate with a warning.
 
-## Docker / MLflow
+## Docker
 
-Planned in Milestones 3–4.
+Planned in Milestone 4.
 
 ---
 

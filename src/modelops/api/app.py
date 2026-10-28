@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -15,7 +16,7 @@ from modelops import __version__
 from modelops.api.deps import model_service
 from modelops.api.model_service import ModelLoadError
 from modelops.api.routes import router
-from modelops.config import load_config
+from modelops.config import REPO_ROOT, load_config
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +24,18 @@ logger = logging.getLogger(__name__)
 def _resolve_model_path(explicit: Path | None = None) -> Path:
     if explicit is not None:
         return explicit
+
+    # Explicit serve override (tests / local demos).
+    env_path = os.getenv("MODELOPS_MODEL_PATH")
+    if env_path:
+        path = Path(env_path)
+        return path if path.is_absolute() else (REPO_ROOT / path)
+
     config = load_config()
     approved = config.approved_model_path
     if approved.exists():
         return approved
-    # Until Milestone 3 promotion exists, fall back to the local candidate artifact.
+    # Local convenience before/without promotion — prefer promoting for demos.
     candidate = config.candidate_dir / "baseline_linear_regression.joblib"
     if candidate.exists():
         logger.warning(

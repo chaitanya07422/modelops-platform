@@ -28,6 +28,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--model-out", type=Path, default=None, help="joblib output path")
     parser.add_argument("--metrics-out", type=Path, default=None, help="metrics JSON output path")
+    parser.add_argument(
+        "--no-mlflow",
+        action="store_true",
+        help="Skip MLflow tracking (still writes candidate artifacts)",
+    )
+    parser.add_argument(
+        "--register-model",
+        action="store_true",
+        help="Also register the sklearn model in the MLflow Model Registry",
+    )
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -54,12 +64,17 @@ def main(argv: list[str] | None = None) -> int:
             config=config,
             model_output=args.model_out,
             metrics_output=args.metrics_out,
+            log_mlflow=not args.no_mlflow,
+            register_model=args.register_model,
         )
     except Exception as exc:  # noqa: BLE001 - CLI boundary
         logging.error("%s", exc)
         return 1
 
     print(json.dumps(train_result_to_dict(result), indent=2))
+    if result.gate is not None and not result.gate.passed:
+        logging.warning("Training finished but quality gate FAILED — do not promote")
+        return 2
     return 0
 
 
