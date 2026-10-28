@@ -1,61 +1,150 @@
 # API reference
 
-**Status:** Planned for Milestone 2. No HTTP server is implemented yet.
+**Status:** Milestone 2 implemented. Prometheus `/metrics` remains planned for Milestone 6.
+
+Base URL (local default): `http://127.0.0.1:8000`
+
+OpenAPI UI: `http://127.0.0.1:8000/docs`
 
 ---
 
-## Planned endpoints
+## Endpoints
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `GET` | `/health` | Process liveness |
-| `GET` | `/ready` | Model loaded and ready to score |
-| `GET` | `/metrics` | Prometheus exposition |
-| `POST` | `/predict` | Single validated prediction |
-| `GET` | `/model-info` | Safe model version / metadata |
-
-Batch prediction may be a separate CLI/job rather than a large HTTP upload
-(decision in Milestone 9).
+| Method | Path | Purpose | Auth |
+|--------|------|---------|------|
+| `GET` | `/health` | Process liveness | None |
+| `GET` | `/ready` | Model loaded and scorers ready | None |
+| `GET` | `/model-info` | Safe model metadata | None |
+| `POST` | `/predict` | Single fare prediction | None |
+| `GET` | `/metrics` | Prometheus (planned M6) | — |
 
 ---
 
 ## Health vs readiness
 
-- **`/health`** — “Is the process up?” Used by basic liveness probes.
-- **`/ready`** — “Can this instance serve predictions?” Should fail if the
-  approved model failed to load or is invalid.
+- **`GET /health`** → `200` if the process is alive. Does **not** check the model.
+- **`GET /ready`** → `200` when a sklearn Pipeline is loaded; `503` otherwise.
+
+Orchestrators should restart on failed liveness and stop sending traffic on failed readiness.
 
 ---
 
-## `/predict` (planned)
-
-Request and response schemas will use Pydantic models with:
-
-- Required fields and types
-- Reasonable range checks
-- Examples in OpenAPI
-
-**Example (placeholder — will not work until Milestone 2):**
+## `GET /health`
 
 ```bash
-curl -s http://127.0.0.1:8000/predict \
-  -H 'Content-Type: application/json' \
-  -d '{ "example": true }'
+curl -s http://127.0.0.1:8000/health
+```
+
+```json
+{"status": "ok"}
 ```
 
 ---
 
-## Errors (planned)
+## `GET /ready`
 
-| Status | When |
-|--------|------|
-| 422 | Validation failure |
-| 503 | Not ready / model unavailable |
-| 500 | Unexpected server error (no stack trace to client) |
+```bash
+curl -s http://127.0.0.1:8000/ready
+```
+
+Success:
+
+```json
+{"status": "ready", "model_loaded": true, "detail": null}
+```
+
+Not ready (`503`):
+
+```json
+{
+  "detail": {
+    "status": "not_ready",
+    "model_loaded": false,
+    "detail": "model_artifact_missing"
+  }
+}
+```
 
 ---
 
-## Metrics (planned)
+## `GET /model-info`
 
-Prometheus counters/histograms for request count, latency, and errors.
-Avoid high-cardinality labels (no raw user IDs or free-text features as labels).
+Returns basename of the artifact (not absolute paths), feature list, optional training metrics from the sidecar JSON, and readiness.
+
+```bash
+curl -s http://127.0.0.1:8000/model-info
+```
+
+---
+
+## `POST /predict`
+
+### Request schema
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `passenger_count` | number | integer-valued, 1–6 |
+| `PULocationID` | integer | 1–265 |
+| `DOLocationID` | integer | 1–265 |
+| `pickup_hour` | integer | 0–23 |
+| `pickup_dow` | integer | 0–6 (Mon=0) |
+| `pickup_day` | integer | 1–31 |
+
+### Example
+
+```bash
+curl -s http://127.0.0.1:8000/predict \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "passenger_count": 1,
+    "PULocationID": 161,
+    "DOLocationID": 236,
+    "pickup_hour": 8,
+    "pickup_dow": 2,
+    "pickup_day": 15
+  }'
+```
+
+Success (`200`):
+
+```json
+{
+  "prediction": 12.3456,
+  "target": "fare_amount",
+  "currency": "USD",
+  "model_id": "baseline-2024-1",
+  "disclaimer": "Learning/demo estimate only — not an official NYC TLC fare quote."
+}
+```
+
+### Errors
+
+| Status | When |
+|--------|------|
+| 422 | Pydantic validation failure (ranges / types) |
+| 503 | Model not loaded / not ready |
+| 500 | Unexpected prediction failure (no stack trace in body) |
+
+Responses never include filesystem secrets or Python tracebacks.
+
+---
+
+## Model loading
+
+- Loaded **once** during application startup (lifespan).
+- Path: `MODELOPS_MODEL_PATH` / approved path in config.
+- If approved is missing, local servers may fall back to
+  `models/candidates/baseline_linear_regression.joblib` (logged warning) until
+  Milestone 3 promotion exists.
+- Startup load failure keeps the process up for `/health` but `/ready` stays `503`.
+
+---
+
+## Run locally
+
+```bash
+pip install -e ".[dev,ml,api]"
+# ensure a candidate or approved model exists (Milestone 1 train)
+export MODELOPS_MODEL_PATH=models/candidates/baseline_linear_regression.joblib
+python -m modelops.api --host 127.0.0.1 --port 8000
+```

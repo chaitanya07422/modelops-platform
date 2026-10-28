@@ -8,9 +8,9 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 1 (data ingestion + baseline ML) is **complete**.
-> API serving, MLflow, Docker, CI, monitoring, and cloud are **not
-> implemented yet**. Claims below that say “Planned” are roadmap items only.
+> **Status:** Milestone 2 (FastAPI inference service) is **complete**.
+> MLflow, Docker, CI, monitoring, and cloud are **not implemented yet**.
+> Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
 authoritative real-world fare quotes.
@@ -35,7 +35,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 |------|--------|-----------|
 | Repository layout, tooling, docs skeleton | **Implemented** | 0 |
 | NYC taxi ingestion, validation, baseline ML | **Implemented** | 1 |
-| FastAPI inference service | Planned | 2 |
+| FastAPI inference service | **Implemented** | 2 |
 | MLflow tracking and model lifecycle | Planned | 3 |
 | Docker / Compose | Planned | 4 |
 | GitHub Actions CI | Planned | 5 |
@@ -196,9 +196,21 @@ python -m pip install -e ".[tracking]"
 
 ## API examples
 
-**Not available yet** (Milestone 2). Planned endpoints include `GET /health`,
-`GET /ready`, `GET /metrics`, `POST /predict`, and `GET /model-info`. See
-[docs/API_REFERENCE.md](docs/API_REFERENCE.md).
+```bash
+pip install -e ".[dev,ml,api]"
+export MODELOPS_MODEL_PATH=models/candidates/baseline_linear_regression.joblib
+python -m modelops.api --host 127.0.0.1 --port 8000
+```
+
+```bash
+curl -s http://127.0.0.1:8000/health
+curl -s http://127.0.0.1:8000/ready
+curl -s http://127.0.0.1:8000/predict \
+  -H 'Content-Type: application/json' \
+  -d '{"passenger_count":1,"PULocationID":161,"DOLocationID":236,"pickup_hour":8,"pickup_dow":2,"pickup_day":15}'
+```
+
+Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md). `/metrics` is planned for Milestone 6.
 
 ---
 
@@ -225,8 +237,9 @@ approval. Cost and cleanup are covered in
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- No inference API, MLflow, Docker, CI, or cloud config yet.
-- Model artifacts are local candidates only — not an “approved” production model.
+- No MLflow promotion workflow, Docker, CI, or cloud config yet.
+- Serving may fall back to a local **candidate** model until Milestone 3 promotion.
+- Predictions are demo estimates, not official TLC quotes.
 
 ---
 

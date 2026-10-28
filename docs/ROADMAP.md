@@ -11,8 +11,8 @@ This file tracks milestone intent versus what has actually been verified.
 | Milestone | Title | Status |
 |-----------|-------|--------|
 | 0 | Repository foundation | **Done** |
-| 1 | Data ingestion and baseline ML | **Done** (verified: fixture tests + TLC sample train) |
-| 2 | FastAPI inference service | Planned |
+| 1 | Data ingestion and baseline ML | **Done** |
+| 2 | FastAPI inference service | **Done** |
 | 3 | MLflow and model lifecycle | Planned |
 | 4 | Docker and reproducibility | Planned |
 | 5 | Continuous integration | Planned |
@@ -22,15 +22,14 @@ This file tracks milestone intent versus what has actually been verified.
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
-## Milestone 1 checklist
+## Milestone 2 checklist
 
-- [x] TLC dictionary reviewed; January 2024 sample downloaded
-- [x] Target = `fare_amount` (pre-trip scenario); leakage columns documented
-- [x] Validation, features, time-based split
-- [x] Ridge linear baseline in sklearn Pipeline
-- [x] MAE / RMSE / R² measured on held-out time split
-- [x] Deterministic synthetic fixture tests
-- [x] Docs updated (`DATASET_AND_MODEL`, local dev, README)
+- [x] `/health`, `/ready`, `/predict`, `/model-info`
+- [x] Pydantic validation and safe error responses
+- [x] Model loaded once at startup; 503 when missing
+- [x] API tests with fixture-trained model
+- [x] Smoke against locally trained candidate
+- [x] API / architecture / local docs updated
 
 ## Rules carried into every milestone
 

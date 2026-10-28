@@ -1,7 +1,7 @@
 # Architecture
 
-**Status:** Target design. **Data + baseline training path implemented (M1).**
-Serving, MLflow, CI, and cloud remain planned.
+**Status:** Target design. **Data/training (M1) and FastAPI serving (M2) implemented.**
+MLflow, CI, Docker, and cloud remain planned.
 
 ---
 
@@ -79,12 +79,14 @@ flowchart TB
 4. Fit Ridge pipeline; write candidate joblib + metrics JSON.
 5. *(Planned M3)* Log to MLflow; run quality gate; promote to approved.
 
-### Online inference (Milestone 2)
+### Online inference (Milestone 2 implemented)
 
-1. Process starts; load approved model once.
-2. `/ready` fails until load succeeds.
-3. `/predict` validates input, scores, returns prediction + model metadata.
-4. Errors map to safe HTTP statuses without stack traces.
+1. Process starts; lifespan loads configured/candidate model once (`ModelService`).
+2. `/health` always OK if process up; `/ready` is `503` until load succeeds.
+3. `/predict` validates with Pydantic, scores via sklearn Pipeline, returns prediction.
+4. `/model-info` returns basename + safe training metadata (no absolute paths).
+5. Errors map to 422/503/500 without stack traces to clients.
+6. Training code is never invoked from request handlers.
 
 ### Batch inference (Milestone 9)
 

@@ -3,8 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 1 — data ingestion + baseline training complete.
-API serving and MLflow are still ahead.
+**Current project stage:** Milestone 2 — FastAPI serving is implemented.
+MLflow lifecycle, Docker, and CI are still ahead.
 
 ---
 
@@ -115,12 +115,21 @@ Completed-trip audit: measurements known after completion (distance, tips, …)
 Mixing the two without documenting it = interview red flag.
 ```
 
-### What to learn before Milestone 2
+### What Milestone 2 taught
 
-1. FastAPI dependency injection and startup model loading.
-2. Health vs readiness probes.
-3. Pydantic validation for prediction payloads matching training features.
-4. Why the API must never call `pipeline.fit`.
+| Piece | Role |
+|-------|------|
+| `modelops.api.model_service` | Load once; predict; ready flag |
+| `modelops.api.schemas` | Request ranges aligned with training filters |
+| `modelops.api.routes` | `/health` `/ready` `/predict` `/model-info` |
+| `modelops.api.app` | Lifespan load; safe error handlers |
+
+### What to learn before Milestone 3
+
+1. MLflow experiments, runs, and artifacts.
+2. Candidate vs approved / registry aliases.
+3. Quality gates before promotion.
+4. How serving should pin an approved alias, not “whatever was last trained.”
 
 ---
 
