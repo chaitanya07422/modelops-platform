@@ -1,0 +1,39 @@
+# ModelOps default configuration (Milestone 0 placeholders).
+# Concrete values for data paths, features, and quality gates are filled in
+# when Milestone 1 implements ingestion and training.
+
+project:
+  name: modelops
+  environment: development
+
+data:
+  # Chosen TLC month is documented in docs/DATASET_AND_MODEL.md (Milestone 1).
+  year: 2024
+  month: 1
+  max_rows: 50000
+  raw_dir: data/raw
+  processed_dir: data/processed
+  fixtures_dir: data/fixtures
+
+training:
+  random_seed: 42
+  # Time-based split policy will be defined with the target in Milestone 1.
+  split_strategy: time_based
+
+model:
+  approved_path: models/approved/model.joblib
+  candidate_dir: models/candidates
+
+api:
+  host: 0.0.0.0
+  port: 8000
+
+mlflow:
+  tracking_uri: file:./mlruns
+  experiment_name: modelops-taxi-fare
+
+quality_gates:
+  # Thresholds intentionally unset until a baseline evaluation exists.
+  max_mae: null
+  max_rmse: null
+  min_r2: null

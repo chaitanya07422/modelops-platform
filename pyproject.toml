@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=75.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modelops"
+version = "0.1.0"
+description = "Production-style MLOps and AI infrastructure platform (portfolio learning project)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+authors = [{ name = "ModelOps contributors" }]
+keywords = ["mlops", "ml", "fastapi", "mlflow", "taxi", "platform"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# Runtime deps are empty in Milestone 0. Feature extras are pinned below and
+# installed as milestones land so local installs stay lean and intentional.
+dependencies = []
+
+[project.optional-dependencies]
+# Lightweight tools for Milestone 0 verification and ongoing quality gates.
+dev = [
+  "pytest==8.3.5",
+  "pytest-cov==6.0.0",
+  "ruff==0.11.2",
+  "httpx==0.28.1",
+]
+# Milestone 1+: data + baseline ML
+ml = [
+  "pandas==2.2.3",
+  "pyarrow==19.0.1",
+  "scikit-learn==1.6.1",
+  "numpy==2.2.4",
+  "joblib==1.4.2",
+  "PyYAML==6.0.2",
+]
+# Milestone 2+: inference API
+api = [
+  "fastapi==0.115.12",
+  "uvicorn[standard]==0.34.0",
+  "pydantic==2.10.6",
+  "pydantic-settings==2.8.1",
+]
+# Milestone 3+: experiment tracking
+tracking = [
+  "mlflow==2.21.0",
+]
+# Convenience meta-extra once the stack is in use
+all = [
+  "modelops[dev,ml,api,tracking]",
+]
+
+[project.urls]
+Documentation = "docs/"
+Repository = "."
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+modelops = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "UP",  # pyupgrade
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
