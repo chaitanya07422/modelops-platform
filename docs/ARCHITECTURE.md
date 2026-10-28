@@ -1,7 +1,11 @@
 # Architecture
 
-**Status:** Target design. **M1–M3 implemented** (data, serving, MLflow + promote/rollback).
-Docker, CI, monitoring, and cloud remain planned.
+**Status:** Target design. **M1–M4 implemented** (data, serving, MLflow, Docker).
+CI, monitoring, and cloud remain planned.
+
+**Docker serving (M4):** `docker compose` builds a non-root API image and mounts
+`models/approved` read-only at `/models/approved`. Training data and MLflow
+stores stay off the image.
 
 ---
 

@@ -120,9 +120,33 @@ python -m modelops.api --host 127.0.0.1 --port 8000
 
 If approved is missing, the app may fall back to the candidate with a warning.
 
-## Docker
+## Docker (Milestone 4)
 
-Planned in Milestone 4.
+Prerequisite: Docker Desktop running, and an approved model:
+
+```bash
+python -m modelops.training --download-if-missing
+python -m modelops.lifecycle promote
+# (synthetic fixture may need --force; prefer TLC sample for a real gate pass)
+```
+
+```bash
+docker compose build api
+docker compose up -d api
+
+curl -s http://127.0.0.1:8000/health
+curl -s http://127.0.0.1:8000/ready
+curl -s http://127.0.0.1:8000/predict \
+  -H 'Content-Type: application/json' \
+  -d '{"passenger_count":1,"PULocationID":161,"DOLocationID":236,"pickup_hour":8,"pickup_dow":2,"pickup_day":15}'
+
+docker compose down
+```
+
+Or: `./scripts/docker_smoke.sh`
+
+The image runs as non-root user `modelops` (uid 10001). The approved model is
+**bind-mounted** read-only — not baked into the image layers.
 
 ---
 

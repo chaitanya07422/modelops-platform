@@ -8,8 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 3 (MLflow + model lifecycle) is **complete**.
-> Docker, CI, monitoring, and cloud are **not implemented yet**.
+> **Status:** Milestone 4 (Docker) is **complete**.
+> CI, monitoring, and cloud are **not implemented yet**.
 > Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
@@ -37,7 +37,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | NYC taxi ingestion, validation, baseline ML | **Implemented** | 1 |
 | FastAPI inference service | **Implemented** | 2 |
 | MLflow tracking and model lifecycle | **Implemented** | 3 |
-| Docker / Compose | Planned | 4 |
+| Docker / Compose | **Implemented** | 4 |
 | GitHub Actions CI | Planned | 5 |
 | Prometheus / Grafana monitoring | Planned | 6 |
 | Cloud Run + Artifact Registry | Planned (approval required) | 7 |
@@ -243,9 +243,21 @@ approval. Cost and cleanup are covered in
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- No Docker, CI, or cloud config yet.
+- No CI or cloud config yet.
 - Candidate→approved promotion is local filesystem + MLflow tracking (not a remote registry server).
 - Predictions are demo estimates, not official TLC quotes.
+
+## Docker
+
+```bash
+# Needs models/approved/model.joblib (train + promote first)
+docker compose build api
+docker compose up -d api
+./scripts/docker_smoke.sh   # optional one-shot verify
+docker compose down
+```
+
+Verified locally: container `/health`, `/ready`, and `/predict` succeeded.
 
 ---
 

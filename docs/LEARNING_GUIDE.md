@@ -3,8 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 3 — MLflow tracking and promote/rollback are implemented.
-Docker and CI are still ahead.
+**Current project stage:** Milestone 4 — Docker packaging for the API is implemented.
+CI is still ahead.
 
 ---
 
@@ -133,11 +133,20 @@ Mixing the two without documenting it = interview red flag.
 | `modelops.lifecycle.promote` | Promote with history; rollback |
 | Serving path order | `MODELOPS_MODEL_PATH` → approved → candidate warning |
 
-### What to learn before Milestone 4
+### What Milestone 4 taught
 
-1. Multi-stage Dockerfiles and non-root users.
-2. Why the API image should not contain training data or secrets.
-3. Compose for API (+ optional MLflow UI) locally.
+| Piece | Role |
+|-------|------|
+| Multi-stage `Dockerfile` | Builder venv with compilers; slim runtime without them |
+| Non-root `modelops` user | uid 10001 — containers should not run as root |
+| Bind-mount `/models/approved` | Model versioned outside the image; swap without rebuild |
+| `read_only` + `tmpfs /tmp` | Shrink attack surface for the serve process |
+
+### What to learn before Milestone 5
+
+1. GitHub Actions workflow triggers (PR vs main).
+2. Caching pip/Docker layers in CI.
+3. Why CI should not download full TLC months or need cloud credentials for unit tests.
 
 ---
 
