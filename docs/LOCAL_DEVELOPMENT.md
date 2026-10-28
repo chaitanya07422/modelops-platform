@@ -158,3 +158,6 @@ The image runs as non-root user `modelops` (uid 10001). The approved model is
 | `FileNotFoundError` on train | Missing raw file | `--download-if-missing` or `--data` |
 | Poor metrics | Expected for zone-only baseline | See `docs/DATASET_AND_MODEL.md` |
 | Import errors | Wrong venv / extras | `pip install -e ".[dev,ml]"` |
+| Docker `ModuleNotFoundError: uvicorn` | Broken image install path | Rebuild with the venv-based `Dockerfile` |
+| Docker `/ready` 503 | Missing approved model mount | Promote first; check `models/approved/model.joblib` |
+| `docker.sock` errors | Daemon not running | Start Docker Desktop |
