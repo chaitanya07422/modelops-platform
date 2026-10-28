@@ -1,6 +1,7 @@
 # Architecture
 
-**Status:** Target design. Only the repository/package foundation exists today.
+**Status:** Target design. **Data + baseline training path implemented (M1).**
+Serving, MLflow, CI, and cloud remain planned.
 
 ---
 
@@ -70,14 +71,13 @@ flowchart TB
 
 ## Flows
 
-### Training (Milestone 1 / 3)
+### Training (Milestone 1 implemented; MLflow in Milestone 3)
 
-1. Load raw month (or capped sample).
-2. Validate and build features.
-3. Time-based split.
-4. Fit pipeline; evaluate; log to MLflow.
-5. Run quality gate; write candidate artifact.
-6. Human or scripted promotion to “approved.”
+1. Download/load raw month (or capped sample) — `python -m modelops.data`.
+2. Validate and build features — `validate_and_clean` / `build_model_frame`.
+3. Time-based split — `time_based_split`.
+4. Fit Ridge pipeline; write candidate joblib + metrics JSON.
+5. *(Planned M3)* Log to MLflow; run quality gate; promote to approved.
 
 ### Online inference (Milestone 2)
 

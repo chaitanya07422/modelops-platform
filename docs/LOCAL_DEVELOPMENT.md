@@ -1,21 +1,19 @@
 # Local development
 
-**Verified in Milestone 0:** Python 3.12 venv, editable install with `[dev]`,
-Ruff, and pytest smoke tests. Other sections are planned.
+**Verified:** Milestone 0 tooling + Milestone 1 data/training path on Python 3.12.14.
 
 ---
 
 ## Environment setup
 
 ```bash
-cd "/path/to/modelops-platform folder first"
+cd "/path/to/modelops-platform-folder-first"
 
-# Prefer an explicit 3.12 interpreter
 python3.12 -m venv .venv
 source .venv/bin/activate
 
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,ml]"
 
 cp .env.example .env
 ```
@@ -23,8 +21,8 @@ cp .env.example .env
 Confirm:
 
 ```bash
-python --version          # expect Python 3.12.x
-python -c "import modelops; print(modelops.__version__)"
+python --version
+python -c "import modelops, pandas, sklearn; print(modelops.__version__)"
 ```
 
 ---
@@ -33,62 +31,73 @@ python -c "import modelops; print(modelops.__version__)"
 
 | Extra | Purpose | When |
 |-------|---------|------|
-| `dev` | pytest, ruff, httpx | Milestone 0+ |
-| `ml` | pandas, pyarrow, sklearn, … | Milestone 1+ |
-| `api` | FastAPI, uvicorn, pydantic | Milestone 2+ |
+| `dev` | pytest, ruff, httpx | Always |
+| `ml` | pandas, pyarrow, sklearn, joblib, PyYAML | Milestone 1+ |
+| `api` | FastAPI stack | Milestone 2+ |
 | `tracking` | MLflow | Milestone 3+ |
-| `all` | union of the above | When you need the full stack |
+| `all` | union | Full local stack |
 
-### Version choices (why these pins)
+### Version notes
 
-- **Python 3.12 only** — Narrow range avoids surprise breaks from 3.13 wheels.
-- **Ruff 0.11.x** — Single tool for lint + format; replaces many flake8 plugins.
-- **pytest 8.x** — Current stable; used with `pythonpath = src`.
-- **ML / API / MLflow pins** — Locked in `pyproject.toml` before first install of
-  each extra so environments stay reproducible. Adjust pins only with a tested
-  commit and a short note in the changelog/commit message.
+- **Python 3.12 only** — pinned in `requires-python`.
+- **pandas 2.2 / PyArrow 19** — TLC Parquet readers.
+- **scikit-learn 1.6** — Pipeline, Ridge, metrics.
+- **Ruff / pytest** — lint and deterministic tests.
 
 ---
 
 ## Configuration
 
 - Defaults: `configs/default.yaml`
-- Overrides: environment variables listed in `.env.example`
-- Never commit `.env`
+- Overrides: `.env` / `MODELOPS_*` (see `.env.example`)
+- Important knobs: `MODELOPS_TAXI_YEAR`, `MODELOPS_TAXI_MONTH`, `MODELOPS_MAX_ROWS`, `MODELOPS_TRAIN_FRACTION`
 
 ---
 
-## Planned commands (not implemented yet)
+## Dataset download
 
 ```bash
-# Milestone 1
-# python -m modelops.data.download ...
-# python -m modelops.training.train ...
-
-# Milestone 2
-# uvicorn modelops.api.app:app --reload --port 8000
-
-# Milestone 3
-# mlflow ui --backend-store-uri ./mlruns
+python -m modelops.data
+# or: python -m modelops.data --force
 ```
 
+Writes `data/raw/yellow_tripdata_YYYY-MM.parquet`. If the network fails, place the file manually — **do not fabricate trips**.
+
 ---
 
-## Test and lint (Milestone 0)
+## Train baseline
 
 ```bash
-ruff check src tests
-ruff format --check src tests
-ruff format src tests          # apply formatting if needed
+python -m modelops.training --download-if-missing
+# or point at a file:
+python -m modelops.training --data data/raw/yellow_tripdata_2024-01.parquet
+# fixture-only (tests / offline):
+python -m modelops.training --data data/fixtures/synthetic_yellow_trips.parquet
+```
+
+Outputs (gitignored):
+
+- `models/candidates/baseline_linear_regression.joblib`
+- `models/candidates/baseline_linear_regression.metrics.json`
+- `data/processed/model_frame_latest.parquet`
+
+---
+
+## Test and lint
+
+```bash
+ruff check src tests scripts
+ruff format --check src tests scripts
 pytest
-pytest -q --cov=modelops      # optional coverage once you want it
 ```
+
+Tests use the synthetic fixture only — no TLC download required.
 
 ---
 
-## Docker / Compose
+## Docker / API / MLflow
 
-Planned in Milestone 4. Do not expect `docker compose up` to work yet.
+Still planned (Milestones 2–4). Prefer the commands above until those land.
 
 ---
 
@@ -96,7 +105,7 @@ Planned in Milestone 4. Do not expect `docker compose up` to work yet.
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| Wrong Python version | Shell `python3` → 3.9 | Use `python3.12` for venv |
-| Import errors | Package not installed editable | `pip install -e ".[dev]"` |
-| Ruff/pytest missing | Dev extra not installed | Same as above |
-| Want ML libs early | Optional | `pip install -e ".[ml]"` after understanding why |
+| Download `RuntimeError` | Network / CDN | Retry or copy Parquet into `data/raw/` manually |
+| `FileNotFoundError` on train | Missing raw file | `--download-if-missing` or `--data` |
+| Poor metrics | Expected for zone-only baseline | See `docs/DATASET_AND_MODEL.md` |
+| Import errors | Wrong venv / extras | `pip install -e ".[dev,ml]"` |

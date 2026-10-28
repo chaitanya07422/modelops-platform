@@ -17,8 +17,9 @@ data:
 
 training:
   random_seed: 42
-  # Time-based split policy will be defined with the target in Milestone 1.
+  # Chronological split by pickup time (earlier = train, later = eval).
   split_strategy: time_based
+  train_fraction: 0.8
 
 model:
   approved_path: models/approved/model.joblib
@@ -33,7 +34,8 @@ mlflow:
   experiment_name: modelops-taxi-fare
 
 quality_gates:
-  # Thresholds intentionally unset until a baseline evaluation exists.
-  max_mae: null
-  max_rmse: null
-  min_r2: null
+  # Provisional ideas from the M1 baseline (MAE≈5.6, RMSE≈8.6, R²≈0.57).
+  # Enforcement arrives with promotion automation in Milestone 3.
+  max_mae: 10.0
+  max_rmse: 15.0
+  min_r2: 0.3

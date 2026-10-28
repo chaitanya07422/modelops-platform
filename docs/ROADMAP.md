@@ -10,8 +10,8 @@ This file tracks milestone intent versus what has actually been verified.
 
 | Milestone | Title | Status |
 |-----------|-------|--------|
-| 0 | Repository foundation | **Done** (verified locally: ruff + pytest) |
-| 1 | Data ingestion and baseline ML | Planned |
+| 0 | Repository foundation | **Done** |
+| 1 | Data ingestion and baseline ML | **Done** (verified: fixture tests + TLC sample train) |
 | 2 | FastAPI inference service | Planned |
 | 3 | MLflow and model lifecycle | Planned |
 | 4 | Docker and reproducibility | Planned |
@@ -22,14 +22,15 @@ This file tracks milestone intent versus what has actually been verified.
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
-## Milestone 0 checklist
+## Milestone 1 checklist
 
-- [x] Inspect workspace / initialize Git without destroying work
-- [x] Feature branch for foundation work
-- [x] `.gitignore`, `.env.example`, `pyproject.toml`
-- [x] `src/modelops` package shell + smoke tests
-- [x] Initial README and docs skeleton
-- [x] Local `pip install -e ".[dev]"`, Ruff, pytest (2 passed; lint/format clean on Python 3.12.14)
+- [x] TLC dictionary reviewed; January 2024 sample downloaded
+- [x] Target = `fare_amount` (pre-trip scenario); leakage columns documented
+- [x] Validation, features, time-based split
+- [x] Ridge linear baseline in sklearn Pipeline
+- [x] MAE / RMSE / R² measured on held-out time split
+- [x] Deterministic synthetic fixture tests
+- [x] Docs updated (`DATASET_AND_MODEL`, local dev, README)
 
 ## Rules carried into every milestone
 

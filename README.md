@@ -8,8 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 0 (repository foundation) is **complete**.
-> Training, API serving, MLflow, Docker, CI, monitoring, and cloud are **not
+> **Status:** Milestone 1 (data ingestion + baseline ML) is **complete**.
+> API serving, MLflow, Docker, CI, monitoring, and cloud are **not
 > implemented yet**. Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
@@ -34,7 +34,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | Area | Status | Milestone |
 |------|--------|-----------|
 | Repository layout, tooling, docs skeleton | **Implemented** | 0 |
-| NYC taxi ingestion, validation, baseline ML | Planned | 1 |
+| NYC taxi ingestion, validation, baseline ML | **Implemented** | 1 |
 | FastAPI inference service | Planned | 2 |
 | MLflow tracking and model lifecycle | Planned | 3 |
 | Docker / Compose | Planned | 4 |
@@ -49,17 +49,19 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 
 ## Problem statement (initial workload)
 
-**Goal:** Estimate a fare-related amount for yellow taxi trips using features that
-are defensible for the chosen prediction-time scenario.
+**Goal:** Pre-trip estimate of yellow taxi **`fare_amount`** (metered fare, USD)
+using pickup/drop-off TLC zones, passenger count, and pickup time — **without**
+post-trip fields such as actual `trip_distance`, tips, or totals.
 
-Milestone 1 will:
+**Verified local baseline** (Jan 2024 sample, `max_rows=50000`, time-based holdout):
 
-- Inspect the official data dictionary and a sample Parquet file.
-- Choose and document a precise target (and exclude leakage-prone columns).
-- Define a time-based train/eval split where appropriate.
-- Train a scikit-learn baseline and report MAE, RMSE, and R² from **actual** runs.
+| Metric | Value |
+|--------|-------|
+| MAE | 5.63 USD |
+| RMSE | 8.61 USD |
+| R² | 0.570 |
 
-Until then, no trained model or metric numbers are claimed.
+Details, leakage rules, and limitations: [docs/DATASET_AND_MODEL.md](docs/DATASET_AND_MODEL.md).
 
 ---
 
@@ -155,11 +157,17 @@ python -c "import modelops; print(modelops.__version__)"
 
 Expected: lint/format clean, smoke tests pass, version `0.1.0`.
 
-ML, API, and MLflow extras are **not** required until their milestones:
+For Milestone 1 training, install ML extras:
 
 ```bash
-# Later — do not install until you need them
-python -m pip install -e ".[ml]"
+python -m pip install -e ".[dev,ml]"
+python -m modelops.data                 # download one TLC month
+python -m modelops.training --download-if-missing
+```
+
+Later extras:
+
+```bash
 python -m pip install -e ".[api]"
 python -m pip install -e ".[tracking]"
 # or: python -m pip install -e ".[all]"
@@ -213,12 +221,12 @@ approval. Cost and cleanup are covered in
 
 ---
 
-## Known limitations (Milestone 0)
+## Known limitations
 
-- No dataset download or training pipeline.
-- No inference API.
-- No MLflow, Docker, CI workflows, or cloud config yet.
-- Documentation stubs describe the **target** system; only foundation items are implemented.
+- Baseline omits routed distance → accuracy is intentionally capped.
+- Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
+- No inference API, MLflow, Docker, CI, or cloud config yet.
+- Model artifacts are local candidates only — not an “approved” production model.
 
 ---
 

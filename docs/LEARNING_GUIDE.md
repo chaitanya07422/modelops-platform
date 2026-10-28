@@ -3,7 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 0 — repository foundation only.
+**Current project stage:** Milestone 1 — data ingestion + baseline training complete.
+API serving and MLflow are still ahead.
 
 ---
 
@@ -53,7 +54,8 @@ only HTTP error rates.
 10. **Observe** — Metrics, logs, drift checks (M6, M9).
 11. **Retrain / rollback** — Documented workflows (M9).
 
-Milestone 0 only creates the empty stage on which these acts will run.
+Milestones 0–1 implement packaging plus steps 1–6 for the taxi workload. Serving
+and registry come next.
 
 ---
 
@@ -92,14 +94,17 @@ is a later optional extension, not a day-one requirement.
 
 ---
 
-## What to learn before Milestone 1
+## What Milestone 1 taught (read the code)
 
-1. Python packaging with `src/` layout and editable installs.
-2. Why raw / processed / fixtures / models directories are separated.
-3. What “target leakage” means (features that cheat because they appear only after
-   the event you claim to predict).
-4. Mean Absolute Error vs RMSE vs R² at a conceptual level.
-5. Read the TLC trip record page and skim the data dictionary.
+| Module | Role |
+|--------|------|
+| `modelops.data.download` | Repeatable TLC fetch with provenance fields |
+| `modelops.data.load` | Parquet + `max_rows` cap |
+| `modelops.data.validate` | Explicit drop reasons (no silent fabrication) |
+| `modelops.data.features` | Pre-trip feature set; leakage denylist |
+| `modelops.data.split` | Chronological train/eval cut |
+| `modelops.training.pipeline` | Ridge + OHE zones (why not plain OLS) |
+| `modelops.training.train` | Orchestrates fit, metrics JSON, candidate artifact |
 
 ### Mini mental model: prediction time
 
@@ -110,14 +115,21 @@ Completed-trip audit: measurements known after completion (distance, tips, …)
 Mixing the two without documenting it = interview red flag.
 ```
 
+### What to learn before Milestone 2
+
+1. FastAPI dependency injection and startup model loading.
+2. Health vs readiness probes.
+3. Pydantic validation for prediction payloads matching training features.
+4. Why the API must never call `pipeline.fit`.
+
 ---
 
 ## Common mistakes
 
 - Committing raw Parquet or `.pkl` models to Git.
-- Installing every optional extra on day one “just in case.”
-- Writing docs that claim CI/cloud already works.
+- Using `trip_distance` in a “pre-trip” model without calling it a routing estimate.
 - Random train/test splits on time-ordered trip data without justification.
+- Treating the learning baseline as a production fare quote.
 
 ## Production considerations
 

@@ -1,7 +1,15 @@
 # Test fixtures
 
-Small, **explicitly labeled synthetic** files for deterministic automated tests.
+## `synthetic_yellow_trips.parquet`
 
-- Allowed in Git only when tiny and clearly marked as synthetic.
-- Never used as a silent stand-in for missing production TLC data during training demos.
-- Milestone 1 will add fixtures if/when training tests need them.
+- **Label:** Synthetic / non-TLC. For deterministic automated tests only.
+- **Contents:** ~200 plausible rows plus intentionally invalid fares/durations.
+- **Schema:** Mimics yellow taxi columns required by Milestone 1.
+- **Not for demos:** Never present as real NYC trip data or as a silent
+  replacement when the official TLC download fails.
+
+Regenerate:
+
+```bash
+python scripts/generate_synthetic_fixture.py
+```
