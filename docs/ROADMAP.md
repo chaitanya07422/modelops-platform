@@ -19,26 +19,18 @@ This file tracks milestone intent versus what has actually been verified.
 | 6 | Monitoring and observability | **Done** |
 | 7 | Cloud deployment + CD (GCP free-tier / credits) | **Done** |
 | 8 | Terraform IaC | **Done** |
-| 9 | Advanced platform capabilities | Planned |
+| 9 | Batch inference + drift + delayed quality | **In progress** |
 | 10 | Portfolio and interview readiness | Planned |
 
-## Milestone 7 checklist
+## Milestone 9 checklist
 
-- [x] Artifact Registry + Cloud Run deploy script
-- [x] Cloud Run Dockerfile with baked approved model
-- [x] Teardown script + cost controls (scale to zero)
-- [x] Docs (CI/CD + cloud)
-- [x] WIF setup script + GCS model upload for GitHub CD
-- [x] Deploy job on push to `main`
-- [x] GitHub Actions secrets + GCS model upload
-- [x] Live CD smoke verified (`/health`, `/ready` on Cloud Run)
-
-## Milestone 8 checklist
-
-- [x] Terraform for APIs, Artifact Registry, GCS models bucket, Cloud Run, deploy SA IAM
-- [x] Import / plan against live `modelops-platform` — **No changes**
-- [x] Docs: apply / destroy / coexistence with GitHub CD
-- [x] Commit / PR (#4)
+- [x] Batch score CLI (`python -m modelops.batch`)
+- [x] Training/promote writes `reference_features.json`
+- [x] PSI drift CLI (`python -m modelops.monitoring.drift`)
+- [x] Delayed ground-truth quality CLI (`python -m modelops.monitoring.quality`)
+- [x] Pytest coverage
+- [x] Docs + README
+- [ ] Commit / PR
 
 ## Rules carried into every milestone
 

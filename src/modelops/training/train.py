@@ -12,7 +12,7 @@ from typing import Any
 import joblib
 import pandas as pd
 
-from modelops.config import AppConfig, load_config
+from modelops.config import REPO_ROOT, AppConfig, load_config
 from modelops.data.features import FEATURE_COLUMNS, TARGET_COLUMN, build_model_frame
 from modelops.data.load import load_taxi_parquet
 from modelops.data.split import time_based_split
@@ -22,6 +22,7 @@ from modelops.lifecycle.gates import (
     QualityThresholds,
     evaluate_quality_gates,
 )
+from modelops.monitoring.reference import build_feature_reference, save_reference
 from modelops.training.evaluate import RegressionMetrics, evaluate_regressor
 from modelops.training.pipeline import build_baseline_pipeline
 
@@ -111,6 +112,12 @@ def train_baseline(
 
     joblib.dump(pipeline, model_path)
 
+    # Drift baseline: quantile histograms from the training feature matrix.
+    reference = build_feature_reference(x_train)
+    reference_path = model_path.parent / "reference_features.json"
+    save_reference(reference, reference_path)
+    save_reference(reference, REPO_ROOT / "artifacts" / "reference_features.json")
+
     payload: dict[str, Any] = {
         "model_type": "sklearn.pipeline.Pipeline[ColumnTransformer, Ridge]",
         "target": TARGET_COLUMN,
@@ -130,6 +137,7 @@ def train_baseline(
         "scenario": "pre_trip_fare_amount_standard_rate",
         "gate": gate.as_dict(),
         "mlflow_run_id": None,
+        "reference_features_path": str(reference_path),
     }
     metrics_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 

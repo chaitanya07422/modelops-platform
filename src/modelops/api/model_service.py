@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
@@ -117,6 +118,21 @@ class ModelService:
         if value != value:  # NaN
             raise RuntimeError("Model returned a non-finite prediction")
         return value
+
+    def predict_frame(self, features: pd.DataFrame) -> pd.Series:
+        """Score a feature table (batch); columns must include FEATURE_COLUMNS."""
+        if not self.ready or self.pipeline is None:
+            raise ModelNotReadyError("Model is not ready")
+
+        missing = [col for col in FEATURE_COLUMNS if col not in features.columns]
+        if missing:
+            raise ValueError(f"Missing feature columns: {missing}")
+
+        matrix = features.loc[:, list(FEATURE_COLUMNS)]
+        prediction = np.asarray(self.pipeline.predict(matrix), dtype=float)
+        if not np.isfinite(prediction).all():
+            raise RuntimeError("Model returned a non-finite prediction")
+        return pd.Series(prediction, index=features.index, name="prediction")
 
     def info(self) -> dict[str, Any]:
         info: dict[str, Any] = {

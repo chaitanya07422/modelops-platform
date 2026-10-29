@@ -136,6 +136,7 @@ def promote_candidate(
 
     history_dir: Path | None = None
     approved.parent.mkdir(parents=True, exist_ok=True)
+    approved_reference = approved.parent / "reference_features.json"
     if approved.exists():
         stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         history_dir = _history_root(approved) / stamp
@@ -143,14 +144,23 @@ def promote_candidate(
         shutil.copy2(approved, history_dir / "model.joblib")
         if approved_metrics.exists():
             shutil.copy2(approved_metrics, history_dir / "model.metrics.json")
+        if approved_reference.exists():
+            shutil.copy2(approved_reference, history_dir / "reference_features.json")
         logger.info("Archived previous approved model to %s", history_dir)
 
     shutil.copy2(model_src, approved)
+    candidate_reference = model_src.parent / "reference_features.json"
+    if candidate_reference.exists():
+        shutil.copy2(candidate_reference, approved_reference)
+        logger.info("Copied drift reference to %s", approved_reference)
+
     promote_payload = dict(payload)
     promote_payload["promoted_at_utc"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     promote_payload["promoted_from"] = str(model_src)
     promote_payload["gate"] = gate.as_dict()
     promote_payload["forced"] = force and not gate.passed
+    if approved_reference.exists():
+        promote_payload["reference_features_path"] = str(approved_reference)
     approved_metrics.write_text(json.dumps(promote_payload, indent=2) + "\n", encoding="utf-8")
 
     pointer = approved.parent / "CURRENT.json"

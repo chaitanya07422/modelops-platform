@@ -3,7 +3,7 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 6 — Prometheus/Grafana monitoring is implemented.
+**Current project stage:** Milestone 9 — batch scoring, PSI drift, and delayed quality are implemented.
 Cloud deploy is still ahead (approval required).
 
 ---
@@ -158,7 +158,7 @@ Mixing the two without documenting it = interview red flag.
 | `/metrics` | Prometheus scrape endpoint |
 | Low-cardinality labels | Route templates + coarse outcomes only |
 | Compose `monitoring` profile | Optional Prometheus + Grafana without forcing them on every `up` |
-| Service vs model monitoring | Latency/errors now; drift/quality later (M9) |
+| Service vs model monitoring | Latency/errors (M6); PSI drift + delayed quality (M9) |
 
 ### What to learn before Milestone 7
 
