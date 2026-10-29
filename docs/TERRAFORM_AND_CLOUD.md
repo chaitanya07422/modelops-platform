@@ -26,6 +26,7 @@ incident recovery.
 | Models GCS bucket | `gcs.tf` |
 | Deploy SA + project IAM | `iam.tf` |
 | Cloud Run `modelops-api` (+ public invoker) | `cloud_run.tf` |
+| Cloud Monitoring dashboard (Cloud Run charts) | `monitoring.tf` |
 
 **Still scripted:** Workload Identity pool/provider (`scripts/gcp_wif_setup.sh`).
 **Still CD-owned:** container image digest on each push to `main` (Terraform

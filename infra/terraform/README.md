@@ -9,6 +9,7 @@ Declarative GCP resources that match the Milestone 7 Cloud Run stack.
 | GCS models bucket | `gcs.tf` | `gcp_upload_model.sh` |
 | Deploy SA + core IAM | `iam.tf` | `gcp_wif_setup.sh` |
 | Cloud Run `modelops-api` | `cloud_run.tf` | **GitHub CD** (image ignored in TF) |
+| Cloud Monitoring dashboard | `monitoring.tf` | Console charts for Cloud Run |
 
 WIF pool/provider remain in [`scripts/gcp_wif_setup.sh`](../../scripts/gcp_wif_setup.sh) for now (OIDC attribute conditions are awkward in pure TF without churn).
 
