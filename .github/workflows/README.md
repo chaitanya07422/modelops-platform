@@ -1,6 +1,9 @@
 # GitHub Actions
 
-Workflow YAML files will be added in **Milestone 5** (lint, test, image build).
+| Workflow | File | Purpose |
+|----------|------|---------|
+| CI | `ci.yml` | Ruff lint/format, pytest, Docker image build |
 
-This directory is reserved so the CI layout is visible from Milestone 0 without
-claiming automation that does not exist yet.
+Triggers: pushes and pull requests to `main`.
+
+No cloud deployment runs from these workflows (Milestone 7+).

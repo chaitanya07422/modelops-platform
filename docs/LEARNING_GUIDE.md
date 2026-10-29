@@ -3,8 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 4 — Docker packaging for the API is implemented.
-CI is still ahead.
+**Current project stage:** Milestone 5 — GitHub Actions CI is implemented.
+Monitoring and cloud are still ahead.
 
 ---
 
@@ -142,11 +142,20 @@ Mixing the two without documenting it = interview red flag.
 | Bind-mount `/models/approved` | Model versioned outside the image; swap without rebuild |
 | `read_only` + `tmpfs /tmp` | Shrink attack surface for the serve process |
 
-### What to learn before Milestone 5
+### What Milestone 5 taught
 
-1. GitHub Actions workflow triggers (PR vs main).
-2. Caching pip/Docker layers in CI.
-3. Why CI should not download full TLC months or need cloud credentials for unit tests.
+| Piece | Role |
+|-------|------|
+| `lint` job | Fail fast on style/import issues (Ruff) |
+| `test` job | Deterministic pytest with synthetic fixture |
+| `docker` job | Prove the Dockerfile still builds after code changes |
+| No secrets in CI | Unit/lint/build should not need GCP keys |
+
+### What to learn before Milestone 6
+
+1. Prometheus metric types (counter, histogram) and cardinality pitfalls.
+2. Service SLIs vs model-quality signals.
+3. Grafana dashboard as code.
 
 ---
 

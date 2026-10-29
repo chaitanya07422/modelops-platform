@@ -8,8 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 4 (Docker) is **complete**.
-> CI, monitoring, and cloud are **not implemented yet**.
+> **Status:** Milestone 5 (CI) is **complete** (workflow committed; confirm the live Actions run on GitHub).
+> Monitoring and cloud are **not implemented yet**.
 > Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
@@ -38,7 +38,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | FastAPI inference service | **Implemented** | 2 |
 | MLflow tracking and model lifecycle | **Implemented** | 3 |
 | Docker / Compose | **Implemented** | 4 |
-| GitHub Actions CI | Planned | 5 |
+| GitHub Actions CI | **Implemented** | 5 |
 | Prometheus / Grafana monitoring | Planned | 6 |
 | Cloud Run + Artifact Registry | Planned (approval required) | 7 |
 | Terraform IaC | Planned (approval required) | 8 |
@@ -116,7 +116,7 @@ Components above the Milestone 0 package shell are **planned**. See
 | API | FastAPI, Pydantic, uvicorn | `modelops[api]` (Milestone 2+) |
 | Tracking | MLflow | `modelops[tracking]` (Milestone 3+) |
 | Containers | Docker / Compose | Milestone 4 |
-| CI/CD | GitHub Actions | Milestone 5 |
+| CI/CD | GitHub Actions | **Implemented (M5)** — lint, pytest, Docker build |
 | Cloud | GCP Cloud Run, Artifact Registry, Terraform | Milestones 7–8; **no paid resources without approval** |
 
 Version pins and rationale live in `pyproject.toml` and
@@ -222,8 +222,10 @@ Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md). `/metrics` is plan
 
 ## Testing / Docker / CI / monitoring / cloud
 
-Documented as **planned** in the linked docs. Do not treat those sections as
-verified until the corresponding milestone report says they passed locally.
+- **Tests:** `pytest` (synthetic fixture; no TLC download required)
+- **Docker:** see Docker section below
+- **CI:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — lint, pytest, image build (no push/deploy). Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
+- **Monitoring / cloud:** planned (Milestones 6–7)
 
 **Cloud note:** No Google Cloud resources will be created without your explicit
 approval. Cost and cleanup are covered in
@@ -243,7 +245,8 @@ approval. Cost and cleanup are covered in
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- No CI or cloud config yet.
+- Cloud deploy is not configured yet (Milestone 7).
+- CI builds the Docker image but does not push or deploy.
 - Candidate→approved promotion is local filesystem + MLflow tracking (not a remote registry server).
 - Predictions are demo estimates, not official TLC quotes.
 
