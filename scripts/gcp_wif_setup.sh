@@ -62,7 +62,8 @@ for ROLE in \
   roles/run.admin \
   roles/cloudbuild.builds.editor \
   roles/iam.serviceAccountUser \
-  roles/storage.objectAdmin
+  roles/storage.objectAdmin \
+  roles/serviceusage.serviceUsageConsumer
 do
   gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
     --member="serviceAccount:${SA_EMAIL}" \
@@ -81,6 +82,23 @@ if ! gcloud artifacts repositories describe modelops \
     --description="ModelOps API images" \
     --project="${PROJECT_ID}"
 fi
+
+echo "==> Ensuring Cloud Build source bucket"
+CB_BUCKET="${PROJECT_ID}_cloudbuild"
+if ! gcloud storage buckets describe "gs://${CB_BUCKET}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud storage buckets create "gs://${CB_BUCKET}" \
+    --project="${PROJECT_ID}" \
+    --location="${REGION}" \
+    --uniform-bucket-level-access
+fi
+gcloud storage buckets add-iam-policy-binding "gs://${CB_BUCKET}" \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/storage.objectAdmin" \
+  --quiet >/dev/null
+gcloud storage buckets add-iam-policy-binding "gs://${CB_BUCKET}" \
+  --member="serviceAccount:${CLOUD_BUILD_SA}" \
+  --role="roles/storage.objectAdmin" \
+  --quiet >/dev/null || true
 
 # Cloud Build default SA must push images; Compute SA is often the Cloud Run runtime identity.
 echo "==> IAM for Cloud Build / Compute SAs"
