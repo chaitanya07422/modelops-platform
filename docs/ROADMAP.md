@@ -19,7 +19,7 @@ This file tracks milestone intent versus what has actually been verified.
 | 6 | Monitoring and observability | **Done** |
 | 7 | Cloud deployment + CD (GCP free-tier / credits) | **Done** |
 | 8 | Terraform IaC | **Done** |
-| 9 | Batch inference + drift + delayed quality | **In progress** |
+| 9 | Batch inference + drift + delayed quality | **Done** |
 | 10 | Portfolio and interview readiness | Planned |
 
 ## Milestone 9 checklist
@@ -30,7 +30,7 @@ This file tracks milestone intent versus what has actually been verified.
 - [x] Delayed ground-truth quality CLI (`python -m modelops.monitoring.quality`)
 - [x] Pytest coverage
 - [x] Docs + README
-- [ ] Commit / PR
+- [x] Commit / PR (#5)
 
 ## Rules carried into every milestone
 
