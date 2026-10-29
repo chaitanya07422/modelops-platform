@@ -1,0 +1,58 @@
+# Cloud Run image — same as Dockerfile, plus a baked approved model.
+# Models are gitignored; local/Cloud Build context must include models/approved/.
+# Prefer scripts/gcp_deploy.sh over building this file by hand.
+
+FROM python:3.12.14-slim-bookworm AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PATH="/opt/venv/bin:${PATH}"
+
+WORKDIR /build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m venv /opt/venv \
+    && pip install --upgrade pip
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN pip install ".[ml,api]"
+
+
+FROM python:3.12.14-slim-bookworm AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MODELOPS_ENV=production \
+    MODELOPS_API_HOST=0.0.0.0 \
+    MODELOPS_API_PORT=8000 \
+    MODELOPS_APPROVED_MODEL_PATH=/models/approved/model.joblib \
+    MODELOPS_MODEL_PATH=/models/approved/model.joblib \
+    PATH="/opt/venv/bin:${PATH}" \
+    PYTHONPATH="/app/src"
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 10001 modelops \
+    && useradd --system --uid 10001 --gid modelops --create-home --home-dir /home/modelops modelops
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --chown=modelops:modelops pyproject.toml README.md ./
+COPY --chown=modelops:modelops src ./src
+COPY --chown=modelops:modelops configs ./configs
+COPY --chown=modelops:modelops models/approved/model.joblib models/approved/model.metrics.json /models/approved/
+
+USER modelops
+
+EXPOSE 8000
+
+# Cloud Run sets PORT (we deploy with --port=8080).
+CMD ["sh", "-c", "uvicorn modelops.api.app:app --host 0.0.0.0 --port ${PORT:-8080}"]
