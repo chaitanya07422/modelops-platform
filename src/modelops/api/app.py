@@ -14,6 +14,8 @@ from fastapi.responses import JSONResponse
 
 from modelops import __version__
 from modelops.api.deps import model_service
+from modelops.api.metrics import set_model_ready
+from modelops.api.middleware import MetricsMiddleware
 from modelops.api.model_service import ModelLoadError
 from modelops.api.routes import router
 from modelops.config import REPO_ROOT, load_config
@@ -54,10 +56,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     metrics_path = getattr(app.state, "metrics_path", None)
     try:
         model_service.load(model_path, metrics_path=metrics_path)
+        set_model_ready(True)
     except ModelLoadError:
         # Process stays up for /health; /ready and /predict return 503.
+        set_model_ready(False)
         logger.error("Startup model load failed; service will report not ready")
     yield
+    set_model_ready(False)
 
 
 def create_app(
@@ -111,6 +116,7 @@ def create_app(
             content={"detail": "Internal server error"},
         )
 
+    app.add_middleware(MetricsMiddleware)
     app.include_router(router)
     return app
 

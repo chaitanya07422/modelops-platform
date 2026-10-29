@@ -148,6 +148,17 @@ Or: `./scripts/docker_smoke.sh`
 The image runs as non-root user `modelops` (uid 10001). The approved model is
 **bind-mounted** read-only — not baked into the image layers.
 
+### Monitoring stack (Milestone 6)
+
+```bash
+docker compose --profile monitoring up -d
+curl -s http://127.0.0.1:8000/metrics | head
+open http://127.0.0.1:9090   # Prometheus
+open http://127.0.0.1:3000   # Grafana (anonymous Viewer; admin/modelops)
+```
+
+Without Docker: run `python -m modelops.api` and `curl /metrics`.
+
 ---
 
 ## Troubleshooting

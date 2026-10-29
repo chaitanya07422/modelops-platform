@@ -1,8 +1,7 @@
-# Local ModelOps API stack.
+# Local ModelOps API + monitoring stack.
 # Prerequisite: an approved model at ./models/approved/model.joblib
 #   python -m modelops.training --download-if-missing
 #   python -m modelops.lifecycle promote
-# (or promote --force only for wiring tests)
 
 services:
   api:
@@ -21,7 +20,6 @@ services:
       MODELOPS_APPROVED_MODEL_PATH: /models/approved/model.joblib
       MODELOPS_MODEL_PATH: /models/approved/model.joblib
     volumes:
-      # Read-only model mount — do not bake training data into the image.
       - ./models/approved:/models/approved:ro
     read_only: true
     tmpfs:
@@ -37,3 +35,39 @@ services:
       timeout: 5s
       retries: 3
       start_period: 25s
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: modelops-prometheus
+    profiles: ["monitoring"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: modelops-grafana
+    profiles: ["monitoring"]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: modelops
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped

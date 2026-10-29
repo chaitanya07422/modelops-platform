@@ -3,8 +3,8 @@
 **Audience:** engineers comfortable with application backends (for example Node.js)
 who are learning Python, ML, and MLOps.
 
-**Current project stage:** Milestone 5 — GitHub Actions CI is implemented.
-Monitoring and cloud are still ahead.
+**Current project stage:** Milestone 6 — Prometheus/Grafana monitoring is implemented.
+Cloud deploy is still ahead (approval required).
 
 ---
 
@@ -151,11 +151,20 @@ Mixing the two without documenting it = interview red flag.
 | `docker` job | Prove the Dockerfile still builds after code changes |
 | No secrets in CI | Unit/lint/build should not need GCP keys |
 
-### What to learn before Milestone 6
+### What Milestone 6 taught
 
-1. Prometheus metric types (counter, histogram) and cardinality pitfalls.
-2. Service SLIs vs model-quality signals.
-3. Grafana dashboard as code.
+| Piece | Role |
+|-------|------|
+| `/metrics` | Prometheus scrape endpoint |
+| Low-cardinality labels | Route templates + coarse outcomes only |
+| Compose `monitoring` profile | Optional Prometheus + Grafana without forcing them on every `up` |
+| Service vs model monitoring | Latency/errors now; drift/quality later (M9) |
+
+### What to learn before Milestone 7
+
+1. Cloud Run revisions and traffic splitting for rollback.
+2. Artifact Registry image tagging.
+3. Cost of always-on vs scale-to-zero services.
 
 ---
 
