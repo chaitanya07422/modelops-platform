@@ -8,8 +8,9 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestones 0–8 are **Done** (local MLOps → Cloud Run CD → Terraform).
-> Push to `main` deploys via GitHub Actions; infra lives under `infra/terraform/`. Tear down when demos finish.
+> **Status:** Milestones 0–8 **Done**. Milestone 9 (batch + drift + delayed quality) is **in progress**.
+> Push to `main` deploys via GitHub Actions; infra under `infra/terraform/`. Tear down when demos finish.
+
 This is a portfolio and learning project. Models trained here are **not**
 authoritative real-world fare quotes.
 
@@ -40,7 +41,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | Prometheus / Grafana monitoring | **Implemented** | 6 |
 | Cloud Run + Artifact Registry + CD on `main` | **Implemented** | 7 |
 | Terraform IaC | **Implemented** | 8 |
-| Batch inference, drift, retrain, K8s extension | Planned | 9 |
+| Batch inference, PSI drift, delayed quality | **In progress** | 9 |
 | Portfolio / interview polish | Planned | 10 |
 
 ---
@@ -225,6 +226,7 @@ Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 - **Monitoring:** Prometheus `/metrics` + Grafana dashboard (Compose profile `monitoring`)
 - **Cloud / CD:** WIF + GCS model + push to `main` (or `./scripts/gcp_deploy.sh`). Teardown: `./scripts/gcp_teardown.sh`.
 - **Terraform:** [`infra/terraform/`](infra/terraform/) — import live stack, `terraform plan` should be clean. Details: [docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
+- **Batch / drift:** `python -m modelops.batch`, `python -m modelops.monitoring.drift`, `python -m modelops.monitoring.quality`. Details: [docs/MONITORING_AND_RELIABILITY.md](docs/MONITORING_AND_RELIABILITY.md).
 
 **Cloud note:** Prefer free-tier / trial credits, scale-to-zero, and teardown after demos.
 

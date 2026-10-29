@@ -11,7 +11,13 @@
 | `gcp_deploy.sh` | Manual: APIs → upload model (default) → Cloud Build → Cloud Run |
 | `gcp_teardown.sh` | Delete Cloud Run (optional: images / AR repo) |
 
-Prefer the `python -m modelops.*` entry points after `pip install -e ".[dev,ml]"`.
+Prefer the `python -m modelops.*` entry points after `pip install -e ".[dev,ml]"`:
+
+| Module | Purpose |
+|--------|---------|
+| `python -m modelops.batch` | Batch-score Parquet/CSV with approved model |
+| `python -m modelops.monitoring.drift` | PSI drift vs `reference_features.json` |
+| `python -m modelops.monitoring.quality` | MAE/RMSE when labels present on scored table |
 
 ### Enable GitHub CD (once)
 

@@ -93,9 +93,15 @@ flowchart TB
 5. Errors map to 422/503/500 without stack traces to clients.
 6. Training code is never invoked from request handlers.
 
-### Batch inference (Milestone 9)
+### Batch inference + monitoring (Milestone 9)
 
-Offline job reads a feature table, applies the same approved model, writes scores.
+1. Offline job (`python -m modelops.batch`) reads Parquet/CSV features, loads the
+   same approved joblib Pipeline as the API, writes scored rows + summary JSON.
+2. Training persists `reference_features.json`; promote copies it beside approved.
+3. Drift job (`python -m modelops.monitoring.drift`) computes per-feature PSI vs
+   that reference and fails when thresholds breach.
+4. Quality job (`python -m modelops.monitoring.quality`) computes MAE/RMSE/R² when
+   delayed `fare_amount` labels are present on the scored table.
 
 ---
 

@@ -1,7 +1,7 @@
 # Monitoring and reliability
 
-**Status:** Milestone 6 service metrics **implemented**. Drift / ground-truth
-model-quality monitoring remains planned for Milestone 9.
+**Status:** Milestone 6 service metrics **implemented**. Milestone 9 offline
+**drift (PSI)** and **delayed ground-truth quality** are **implemented**.
 
 ---
 
@@ -10,8 +10,8 @@ model-quality monitoring remains planned for Milestone 9.
 | Layer | Examples | Question answered | Status |
 |-------|----------|-------------------|--------|
 | Service | QPS, latency, 5xx, readiness | Is the API healthy? | **Implemented** |
-| Model input | Feature distributions, null rates | Did the world change? | Planned (M9) |
-| Model quality | MAE vs delayed ground truth | Is the model still useful? | Planned (M9) |
+| Model input | Feature PSI vs training reference | Did the world change? | **Implemented (M9)** |
+| Model quality | MAE/RMSE vs delayed ground truth | Is the model still useful? | **Implemented (M9)** |
 
 **Data drift** — input distribution shifts.
 **Concept drift** — relationship between inputs and target shifts.
@@ -82,8 +82,8 @@ Without Docker, run the API locally and scrape with a host Prometheus pointed at
 | Latency rise | Check payload size, CPU limits, competing load |
 | `modelops_model_ready == 0` | Missing/invalid approved artifact; promote or remount |
 | Prediction `not_ready` rising | Same as readiness failure |
-| Feature drift (later) | Inspect upstream data; consider retrain |
-| Quality drop (later) | Rollback approved model; open retrain |
+| Feature drift (`any_above_threshold`) | Inspect upstream data; consider retrain |
+| Quality drop (MAE/RMSE rise) | Rollback approved model; open retrain |
 
 ---
 
@@ -96,8 +96,33 @@ Without Docker, run the API locally and scrape with a host Prometheus pointed at
 
 ---
 
-## What is still planned (Milestone 9)
+## Offline drift + quality (Milestone 9)
 
-- Offline/batch drift detection vs training reference
-- Delayed ground-truth MAE/RMSE monitoring when labels arrive
+Training writes `reference_features.json` (quantile histograms). Promote copies it
+next to `models/approved/`.
+
+```bash
+# Score a feature table with the approved model
+python -m modelops.batch \
+  --input data/fixtures/synthetic_yellow_trips.parquet \
+  --output artifacts/batch_preds.parquet \
+  --model models/approved/model.joblib
+
+# PSI vs training reference (exit 1 if any feature > threshold, default 0.25)
+python -m modelops.monitoring.drift \
+  --input artifacts/batch_preds.parquet \
+  --reference models/approved/reference_features.json \
+  --report artifacts/drift_report.json
+
+# When fare_amount labels are present on the scored table
+python -m modelops.monitoring.quality \
+  --predictions artifacts/batch_preds.parquet \
+  --report artifacts/quality_report.json
+```
+
+**PSI rule of thumb:** &lt; 0.1 stable; 0.1–0.25 moderate; &gt; 0.25 major shift (default fail).
+
+### Still later
+
 - Alertmanager rules wired to paging channels
+- Scheduled Cloud Run Jobs / K8s CronJobs for batch+drift
