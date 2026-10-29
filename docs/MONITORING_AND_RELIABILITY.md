@@ -74,6 +74,31 @@ Without Docker, run the API locally and scrape with a host Prometheus pointed at
 
 ---
 
+## Google Cloud console (where to look)
+
+This project does **not** run a Prometheus server in GCP. You get:
+
+| What | Where |
+|------|--------|
+| **Cloud Run charts** (requests, latency, CPU) | [Cloud Run → modelops-api → Metrics](https://console.cloud.google.com/run/detail/us-central1/modelops-api/metrics?project=modelops-platform) |
+| **Dashboard “ModelOps Cloud Run”** | [Open dashboard](https://console.cloud.google.com/monitoring/dashboards/custom/3df32e01-491f-4d0d-b668-a28e981bd2fd?project=modelops-platform) (Terraform; also under Monitoring → Dashboards) |
+| **Logs** | Cloud Run → Logs, or [Logs Explorer](https://console.cloud.google.com/logs/query?project=modelops-platform) |
+| **Custom `modelops_*` series** | Raw text: `https://<cloud-run-url>/metrics` (curl or browser) |
+
+Terraform: [`infra/terraform/monitoring.tf`](../infra/terraform/monitoring.tf) enables `monitoring.googleapis.com` and the dashboard.
+
+**Not included (cost/complexity):** Managed Service for Prometheus scraping Cloud Run `/metrics` into GMP. Local Compose Prometheus/Grafana remains the way to explore `modelops_*` with a PromQL UI.
+
+Apply after pull:
+
+```bash
+cd infra/terraform
+export GOOGLE_OAUTH_ACCESS_TOKEN="$(gcloud auth print-access-token)"
+terraform apply -auto-approve   # creates/updates the Monitoring dashboard
+```
+
+---
+
 ## Operational responses
 
 | Signal | First response |
