@@ -40,12 +40,13 @@ ml = [
   "joblib==1.4.2",
   "PyYAML==6.0.2",
 ]
-# Milestone 2+: inference API
+# Milestone 2+: inference API (+ Prometheus metrics for Milestone 6)
 api = [
   "fastapi==0.115.12",
   "uvicorn[standard]==0.34.0",
   "pydantic==2.10.6",
   "pydantic-settings==2.8.1",
+  "prometheus-client==0.21.1",
 ]
 # Milestone 3+: experiment tracking
 tracking = [

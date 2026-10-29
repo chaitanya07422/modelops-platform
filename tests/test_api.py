@@ -137,3 +137,28 @@ def test_predict_not_ready(client_without_model: TestClient) -> None:
     assert response.status_code == 503
     assert "stack" not in response.text.lower()
     assert "Traceback" not in response.text
+
+
+def test_metrics_endpoint_exposes_prometheus(client: TestClient) -> None:
+    # Generate at least one prediction sample for custom metrics.
+    client.post(
+        "/predict",
+        json={
+            "passenger_count": 1,
+            "PULocationID": 10,
+            "DOLocationID": 20,
+            "pickup_hour": 8,
+            "pickup_dow": 2,
+            "pickup_day": 5,
+        },
+    )
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "text/plain" in response.headers.get("content-type", "")
+    body = response.text
+    assert "modelops_http_requests_total" in body
+    assert "modelops_predictions_total" in body
+    assert "modelops_model_ready" in body
+    # High-cardinality feature labels must not appear on custom metrics.
+    assert 'PULocationID="' not in body
+    assert 'passenger_count="' not in body

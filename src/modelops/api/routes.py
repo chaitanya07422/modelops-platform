@@ -6,9 +6,10 @@ import logging
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from modelops.api.deps import get_model_service
+from modelops.api.metrics import metrics_payload, record_prediction, set_model_ready
 from modelops.api.model_service import ModelNotReadyError, ModelService
 from modelops.api.schemas import (
     HealthResponse,
@@ -38,6 +39,7 @@ def health() -> HealthResponse:
 )
 def ready(service: ModelServiceDep) -> ReadyResponse:
     """Readiness: an approved model is loaded and predictions can be served."""
+    set_model_ready(service.ready)
     if not service.ready:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -48,6 +50,13 @@ def ready(service: ModelServiceDep) -> ReadyResponse:
             },
         )
     return ReadyResponse(status="ready", model_loaded=True, detail=None)
+
+
+@router.get("/metrics", tags=["ops"], include_in_schema=True)
+def metrics() -> Response:
+    """Prometheus exposition format (text)."""
+    body, content_type = metrics_payload()
+    return Response(content=body, media_type=content_type)
 
 
 @router.get("/model-info", response_model=ModelInfoResponse, tags=["model"])
@@ -90,16 +99,21 @@ def predict(
     try:
         value = service.predict_one(body.as_feature_frame_dict())
     except ModelNotReadyError as exc:
+        record_prediction(outcome="not_ready")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Model is not ready to serve predictions",
         ) from exc
     except Exception:
+        record_prediction(outcome="error")
         logger.exception("Prediction failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Prediction failed",
         ) from None
+
+    rounded = round(value, 4)
+    record_prediction(outcome="success", value=rounded)
 
     info = service.info()
     model_id = None
@@ -107,6 +121,6 @@ def predict(
         model_id = f"baseline-{info.get('dataset_year')}-{info.get('dataset_month')}"
 
     return PredictResponse(
-        prediction=round(value, 4),
+        prediction=rounded,
         model_id=model_id,
     )

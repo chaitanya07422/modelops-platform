@@ -8,8 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 5 (CI) is **complete** (workflow committed; confirm the live Actions run on GitHub).
-> Monitoring and cloud are **not implemented yet**.
+> **Status:** Milestone 6 (monitoring) is **complete**.
+> Cloud deploy is **not implemented yet** (needs your approval later).
 > Claims below that say “Planned” are roadmap items only.
 
 This is a portfolio and learning project. Models trained here are **not**
@@ -39,7 +39,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | MLflow tracking and model lifecycle | **Implemented** | 3 |
 | Docker / Compose | **Implemented** | 4 |
 | GitHub Actions CI | **Implemented** | 5 |
-| Prometheus / Grafana monitoring | Planned | 6 |
+| Prometheus / Grafana monitoring | **Implemented** | 6 |
 | Cloud Run + Artifact Registry | Planned (approval required) | 7 |
 | Terraform IaC | Planned (approval required) | 8 |
 | Batch inference, drift, retrain, K8s extension | Planned | 9 |
@@ -216,7 +216,7 @@ curl -s http://127.0.0.1:8000/predict \
   -d '{"passenger_count":1,"PULocationID":161,"DOLocationID":236,"pickup_hour":8,"pickup_dow":2,"pickup_day":15}'
 ```
 
-Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md). `/metrics` is planned for Milestone 6.
+Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 
 ---
 
@@ -225,7 +225,8 @@ Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md). `/metrics` is plan
 - **Tests:** `pytest` (synthetic fixture; no TLC download required)
 - **Docker:** see Docker section below
 - **CI:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — lint, pytest, image build (no push/deploy). Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
-- **Monitoring / cloud:** planned (Milestones 6–7)
+- **Monitoring:** Prometheus `/metrics` + Grafana dashboard (Compose profile `monitoring`)
+- **Cloud:** planned (Milestone 7; approval required)
 
 **Cloud note:** No Google Cloud resources will be created without your explicit
 approval. Cost and cleanup are covered in

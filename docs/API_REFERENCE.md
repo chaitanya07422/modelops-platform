@@ -1,6 +1,6 @@
 # API reference
 
-**Status:** Milestone 2 implemented. Prometheus `/metrics` remains planned for Milestone 6.
+**Status:** Milestone 2 API + Milestone 6 `/metrics` implemented.
 
 Base URL (local default): `http://127.0.0.1:8000`
 
@@ -16,7 +16,7 @@ OpenAPI UI: `http://127.0.0.1:8000/docs`
 | `GET` | `/ready` | Model loaded and scorers ready | None |
 | `GET` | `/model-info` | Safe model metadata | None |
 | `POST` | `/predict` | Single fare prediction | None |
-| `GET` | `/metrics` | Prometheus (planned M6) | — |
+| `GET` | `/metrics` | Prometheus exposition | None |
 
 ---
 
@@ -140,11 +140,23 @@ Responses never include filesystem secrets or Python tracebacks.
 
 ---
 
+## `GET /metrics`
+
+```bash
+curl -s http://127.0.0.1:8000/metrics | head
+```
+
+Prometheus text exposition including request counts/latency, prediction
+outcomes, fare histogram, and `modelops_model_ready`. See
+[MONITORING_AND_RELIABILITY.md](MONITORING_AND_RELIABILITY.md).
+
+---
+
 ## Run locally
 
 ```bash
 pip install -e ".[dev,ml,api]"
-# ensure a candidate or approved model exists (Milestone 1 train)
-export MODELOPS_MODEL_PATH=models/candidates/baseline_linear_regression.joblib
+# prefer approved after promote; candidate path works for local demos
+export MODELOPS_MODEL_PATH=models/approved/model.joblib
 python -m modelops.api --host 127.0.0.1 --port 8000
 ```
