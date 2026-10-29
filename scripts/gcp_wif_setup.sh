@@ -58,7 +58,7 @@ fi
 echo "==> Project IAM for deploy SA"
 # storage.objectAdmin: Cloud Build source staging + read models bucket (also bound below).
 for ROLE in \
-  roles/artifactregistry.writer \
+  roles/artifactregistry.admin \
   roles/run.admin \
   roles/cloudbuild.builds.editor \
   roles/iam.serviceAccountUser \
@@ -70,6 +70,17 @@ do
     --condition=None \
     --quiet >/dev/null
 done
+
+echo "==> Ensuring Artifact Registry repo modelops"
+if ! gcloud artifacts repositories describe modelops \
+  --location="${REGION}" \
+  --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  gcloud artifacts repositories create modelops \
+    --repository-format=docker \
+    --location="${REGION}" \
+    --description="ModelOps API images" \
+    --project="${PROJECT_ID}"
+fi
 
 # Cloud Build default SA must push images; Compute SA is often the Cloud Run runtime identity.
 echo "==> IAM for Cloud Build / Compute SAs"
