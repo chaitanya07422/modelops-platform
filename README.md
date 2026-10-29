@@ -8,10 +8,9 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 6 (monitoring) is **complete**.
-> Cloud deploy is **not implemented yet** (needs your approval later).
-> Claims below that say “Planned” are roadmap items only.
-
+> **Status:** Milestone 7 (GCP Cloud Run + CD on `main`) is **in progress** — M0–M6 complete.
+> One-time WIF + GCS model upload + GitHub Actions secrets are set for CD on `main`.
+> Push/merge to `main` deploys; or use `./scripts/gcp_deploy.sh` locally. Tear down when done.
 This is a portfolio and learning project. Models trained here are **not**
 authoritative real-world fare quotes.
 
@@ -40,7 +39,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | Docker / Compose | **Implemented** | 4 |
 | GitHub Actions CI | **Implemented** | 5 |
 | Prometheus / Grafana monitoring | **Implemented** | 6 |
-| Cloud Run + Artifact Registry | Planned (approval required) | 7 |
+| Cloud Run + Artifact Registry + CD on `main` | **In progress** (WIF + GCS model) | 7 |
 | Terraform IaC | Planned (approval required) | 8 |
 | Batch inference, drift, retrain, K8s extension | Planned | 9 |
 | Portfolio / interview polish | Planned | 10 |
@@ -99,8 +98,7 @@ flowchart LR
   end
 ```
 
-Components above the Milestone 0 package shell are **planned**. See
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 
@@ -116,8 +114,8 @@ Components above the Milestone 0 package shell are **planned**. See
 | API | FastAPI, Pydantic, uvicorn | `modelops[api]` (Milestone 2+) |
 | Tracking | MLflow | `modelops[tracking]` (Milestone 3+) |
 | Containers | Docker / Compose | Milestone 4 |
-| CI/CD | GitHub Actions | **Implemented (M5)** — lint, pytest, Docker build |
-| Cloud | GCP Cloud Run, Artifact Registry, Terraform | Milestones 7–8; **no paid resources without approval** |
+| CI/CD | GitHub Actions | **CI (M5)** + **CD on main (M7)** — WIF, no JSON keys |
+| Cloud | GCP Cloud Run, Artifact Registry, GCS models | Manual or auto on `main`; Terraform is M8 |
 
 Version pins and rationale live in `pyproject.toml` and
 [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md).
@@ -129,7 +127,7 @@ Version pins and rationale live in `pyproject.toml` and
 - macOS, Linux, or WSL
 - **Python 3.12** (this repo was verified with 3.12.x)
 - Git
-- Optional later: Docker, Google Cloud SDK, Terraform
+- Optional: Docker, Google Cloud SDK (`gcloud`) for Cloud Run deploy
 
 ---
 
@@ -226,11 +224,10 @@ Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 - **Docker:** see Docker section below
 - **CI:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — lint, pytest, image build (no push/deploy). Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
 - **Monitoring:** Prometheus `/metrics` + Grafana dashboard (Compose profile `monitoring`)
-- **Cloud:** planned (Milestone 7; approval required)
+- **Cloud / CD:** WIF setup + GCS model upload, then push to `main` (or `./scripts/gcp_deploy.sh`). Teardown: `./scripts/gcp_teardown.sh`. Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
 
-**Cloud note:** No Google Cloud resources will be created without your explicit
-approval. Cost and cleanup are covered in
-[docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
+**Cloud note:** Prefer free-tier / trial credits, scale-to-zero, and teardown after demos.
+See [docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
 
 ---
 
@@ -246,8 +243,8 @@ approval. Cost and cleanup are covered in
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- Cloud deploy is not configured yet (Milestone 7).
-- CI builds the Docker image but does not push or deploy.
+- PRs run CI only; push to `main` deploys after CI when GitHub Variables + GCS model are set.
+- Cloud Run bakes the approved model from GCS (CD) or local files (manual deploy); swap model → upload + redeploy.
 - Candidate→approved promotion is local filesystem + MLflow tracking (not a remote registry server).
 - Predictions are demo estimates, not official TLC quotes.
 

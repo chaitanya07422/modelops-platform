@@ -1,10 +1,12 @@
 # Terraform and cloud
 
-**Status:** Planned for Milestones 7–8.
+**Status:** Milestone 7 uses **imperative** `gcloud` scripts (`gcp_deploy.sh`,
+`gcp_wif_setup.sh`, `gcp_upload_model.sh`) plus GitHub Actions CD on `main`.
+Milestone 8 will express the same resources in Terraform.
 
-**Hard rule:** Do not `terraform apply` or create paid GCP resources without
-explicit approval. This document exists so you understand cost and cleanup
-*before* anything is provisioned.
+**Hard rule:** Do not `terraform apply` or create extra paid GCP resources without
+explicit approval. M7 Cloud Run was approved against free-tier / trial credits —
+always run teardown when demos finish.
 
 ---
 
