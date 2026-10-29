@@ -8,7 +8,7 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 7 (Cloud Run + CD) is **Done**. Milestone 8 (Terraform) is **in progress**.
+> **Status:** Milestones 0–8 are **Done** (local MLOps → Cloud Run CD → Terraform).
 > Push to `main` deploys via GitHub Actions; infra lives under `infra/terraform/`. Tear down when demos finish.
 This is a portfolio and learning project. Models trained here are **not**
 authoritative real-world fare quotes.
@@ -39,7 +39,7 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | GitHub Actions CI | **Implemented** | 5 |
 | Prometheus / Grafana monitoring | **Implemented** | 6 |
 | Cloud Run + Artifact Registry + CD on `main` | **Implemented** | 7 |
-| Terraform IaC | **In progress** | 8 |
+| Terraform IaC | **Implemented** | 8 |
 | Batch inference, drift, retrain, K8s extension | Planned | 9 |
 | Portfolio / interview polish | Planned | 10 |
 

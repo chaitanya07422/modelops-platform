@@ -18,7 +18,7 @@ This file tracks milestone intent versus what has actually been verified.
 | 5 | Continuous integration | **Done** |
 | 6 | Monitoring and observability | **Done** |
 | 7 | Cloud deployment + CD (GCP free-tier / credits) | **Done** |
-| 8 | Terraform IaC | **In progress** |
+| 8 | Terraform IaC | **Done** |
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
@@ -38,7 +38,7 @@ This file tracks milestone intent versus what has actually been verified.
 - [x] Terraform for APIs, Artifact Registry, GCS models bucket, Cloud Run, deploy SA IAM
 - [x] Import / plan against live `modelops-platform` — **No changes**
 - [x] Docs: apply / destroy / coexistence with GitHub CD
-- [ ] Commit / PR
+- [x] Commit / PR (#4)
 
 ## Rules carried into every milestone
 
