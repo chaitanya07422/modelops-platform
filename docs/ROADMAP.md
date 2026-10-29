@@ -15,19 +15,19 @@ This file tracks milestone intent versus what has actually been verified.
 | 2 | FastAPI inference service | **Done** |
 | 3 | MLflow and model lifecycle | **Done** |
 | 4 | Docker and reproducibility | **Done** |
-| 5 | Continuous integration | Planned |
+| 5 | Continuous integration | **Done** (workflow in-repo; local lint/test verified) |
 | 6 | Monitoring and observability | Planned |
 | 7 | Cloud deployment (approval required) | Planned |
 | 8 | Terraform (approval required) | Planned |
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
-## Milestone 4 checklist
+## Milestone 5 checklist
 
-- [x] Multi-stage Dockerfile (venv builder, non-root runtime)
-- [x] `.dockerignore` and Compose service (read-only model mount)
-- [x] Image build + container smoke (`/health`, `/ready`, `/predict`)
-- [x] Docs updated
+- [x] GitHub Actions workflow (`lint`, `test`, `docker` build)
+- [x] Docs: CI behavior + branch-protection recommendations
+- [x] Local lint/test equivalent of CI jobs
+- [ ] Live Actions run on GitHub (confirm after push/PR)
 
 ## Rules carried into every milestone
 
