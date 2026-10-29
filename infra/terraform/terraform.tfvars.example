@@ -1,0 +1,12 @@
+project_id         = "modelops-platform"
+region             = "us-central1"
+artifact_repo_id   = "modelops"
+model_bucket_name  = "modelops-platform-models"
+cloud_run_service  = "modelops-api"
+# Leave empty to use REGION-docker.pkg.dev/PROJECT/REPO/modelops-api:latest
+# cloud_run_image  = "us-central1-docker.pkg.dev/modelops-platform/modelops/modelops-api:24eeb67"
+deploy_sa_id       = "modelops-github-deploy"
+min_instances      = 0
+max_instances      = 2
+cpu                = "1"
+memory             = "512Mi"

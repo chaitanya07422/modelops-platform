@@ -8,9 +8,8 @@ online and batch inference, CI/CD, monitoring, and optional Google Cloud
 deployment. The first workload predicts a fare-related numerical target from
 [NYC TLC yellow taxi trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
 
-> **Status:** Milestone 7 (GCP Cloud Run + CD on `main`) is **in progress** — M0–M6 complete.
-> One-time WIF + GCS model upload + GitHub Actions secrets are set for CD on `main`.
-> Push/merge to `main` deploys; or use `./scripts/gcp_deploy.sh` locally. Tear down when done.
+> **Status:** Milestone 7 (Cloud Run + CD) is **Done**. Milestone 8 (Terraform) is **in progress**.
+> Push to `main` deploys via GitHub Actions; infra lives under `infra/terraform/`. Tear down when demos finish.
 This is a portfolio and learning project. Models trained here are **not**
 authoritative real-world fare quotes.
 
@@ -39,8 +38,8 @@ LLMOps Engineer, and Cloud Engineer working with ML workloads.
 | Docker / Compose | **Implemented** | 4 |
 | GitHub Actions CI | **Implemented** | 5 |
 | Prometheus / Grafana monitoring | **Implemented** | 6 |
-| Cloud Run + Artifact Registry + CD on `main` | **In progress** (WIF + GCS model) | 7 |
-| Terraform IaC | Planned (approval required) | 8 |
+| Cloud Run + Artifact Registry + CD on `main` | **Implemented** | 7 |
+| Terraform IaC | **In progress** | 8 |
 | Batch inference, drift, retrain, K8s extension | Planned | 9 |
 | Portfolio / interview polish | Planned | 10 |
 
@@ -115,7 +114,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/ROADMAP.md](docs/ROAD
 | Tracking | MLflow | `modelops[tracking]` (Milestone 3+) |
 | Containers | Docker / Compose | Milestone 4 |
 | CI/CD | GitHub Actions | **CI (M5)** + **CD on main (M7)** — WIF, no JSON keys |
-| Cloud | GCP Cloud Run, Artifact Registry, GCS models | Manual or auto on `main`; Terraform is M8 |
+| Cloud | GCP Cloud Run, Artifact Registry, GCS models | CD on `main` (M7); Terraform under `infra/terraform/` (M8) |
 
 Version pins and rationale live in `pyproject.toml` and
 [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md).
@@ -224,10 +223,10 @@ Full schemas: [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 - **Docker:** see Docker section below
 - **CI:** GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — lint, pytest, image build (no push/deploy). Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
 - **Monitoring:** Prometheus `/metrics` + Grafana dashboard (Compose profile `monitoring`)
-- **Cloud / CD:** WIF setup + GCS model upload, then push to `main` (or `./scripts/gcp_deploy.sh`). Teardown: `./scripts/gcp_teardown.sh`. Details: [docs/CI_CD_AND_DEPLOYMENT.md](docs/CI_CD_AND_DEPLOYMENT.md)
+- **Cloud / CD:** WIF + GCS model + push to `main` (or `./scripts/gcp_deploy.sh`). Teardown: `./scripts/gcp_teardown.sh`.
+- **Terraform:** [`infra/terraform/`](infra/terraform/) — import live stack, `terraform plan` should be clean. Details: [docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
 
 **Cloud note:** Prefer free-tier / trial credits, scale-to-zero, and teardown after demos.
-See [docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
 
 ---
 
@@ -243,7 +242,7 @@ See [docs/TERRAFORM_AND_CLOUD.md](docs/TERRAFORM_AND_CLOUD.md).
 
 - Baseline omits routed distance → accuracy is intentionally capped.
 - Local training uses a row cap; not the full TLC month unless you raise `MODELOPS_MAX_ROWS`.
-- PRs run CI only; push to `main` deploys after CI when GitHub Variables + GCS model are set.
+- PRs run CI only; push to `main` deploys after CI when GitHub secrets + GCS model are set.
 - Cloud Run bakes the approved model from GCS (CD) or local files (manual deploy); swap model → upload + redeploy.
 - Candidate→approved promotion is local filesystem + MLflow tracking (not a remote registry server).
 - Predictions are demo estimates, not official TLC quotes.

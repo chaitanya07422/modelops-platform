@@ -17,8 +17,8 @@ This file tracks milestone intent versus what has actually been verified.
 | 4 | Docker and reproducibility | **Done** |
 | 5 | Continuous integration | **Done** |
 | 6 | Monitoring and observability | **Done** |
-| 7 | Cloud deployment + CD (GCP free-tier / credits) | **In progress** |
-| 8 | Terraform (approval required) | Planned |
+| 7 | Cloud deployment + CD (GCP free-tier / credits) | **Done** |
+| 8 | Terraform IaC | **In progress** |
 | 9 | Advanced platform capabilities | Planned |
 | 10 | Portfolio and interview readiness | Planned |
 
@@ -29,15 +29,20 @@ This file tracks milestone intent versus what has actually been verified.
 - [x] Teardown script + cost controls (scale to zero)
 - [x] Docs (CI/CD + cloud)
 - [x] WIF setup script + GCS model upload for GitHub CD
-- [x] Deploy job on push to `main` (WIF → GCS → Cloud Build → Cloud Run)
-- [x] One-time: run `gcp_wif_setup.sh`, set GitHub secrets, `gcp_upload_model.sh`
-- [ ] Live CD smoke verified on `modelops-platform` (needs merge/push to `main`)
+- [x] Deploy job on push to `main`
+- [x] GitHub Actions secrets + GCS model upload
+- [x] Live CD smoke verified (`/health`, `/ready` on Cloud Run)
 
+## Milestone 8 checklist
+
+- [x] Terraform for APIs, Artifact Registry, GCS models bucket, Cloud Run, deploy SA IAM
+- [x] Import / plan against live `modelops-platform` — **No changes**
+- [x] Docs: apply / destroy / coexistence with GitHub CD
 - [ ] Commit / PR
 
 ## Rules carried into every milestone
 
 1. Small change → test → document → commit.
 2. Never claim metrics, deploys, or tests passed without evidence.
-3. No paid cloud resources without explicit approval (M7 uses free-tier credits with teardown).
+3. No paid cloud resources without explicit approval (M7/M8 use free-tier credits with teardown).
 4. Wait for human approval before starting the next milestone.

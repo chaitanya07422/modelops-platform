@@ -1,6 +1,6 @@
 # CI/CD and deployment
 
-**Status:** Milestone 5 CI **implemented**. Milestone 6 monitoring is **local/Compose**. Milestone 7 Cloud Run + **GitHub CD on `main`** (WIF + GCS model + Actions secrets) is **wired**; live smoke pending first merge/push to `main`.
+**Status:** Milestone 5 CI **implemented**. Milestone 6 monitoring is **local/Compose**. Milestone 7 Cloud Run + **GitHub CD on `main`** (WIF + GCS + Actions secrets) is **Done** (live smoke verified). Milestone 8 Terraform: [`infra/terraform/`](../infra/terraform/).
 
 ---
 
@@ -203,6 +203,6 @@ In GitHub → Settings → Branches → rule for `main`:
 
 - [x] `./scripts/gcp_wif_setup.sh` succeeded; GitHub Actions secrets set
 - [x] `./scripts/gcp_upload_model.sh` uploaded `approved/` objects
-- [ ] Push/merge to `main` → Deploy Cloud Run job green + smoke curls OK
-- [ ] PR workflow runs lint/test/docker only (no deploy)
-- [ ] `./scripts/gcp_teardown.sh` documented and tested when demos finish
+- [x] Push/merge to `main` → Deploy Cloud Run job green + smoke curls OK
+- [x] PR workflow runs lint/test/docker only (no deploy)
+- [ ] `./scripts/gcp_teardown.sh` / `terraform destroy` when demos finish
