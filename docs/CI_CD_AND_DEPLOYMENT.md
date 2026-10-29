@@ -22,7 +22,7 @@ Concurrency: one in-flight run per ref; newer pushes cancel older runs.
 | `lint` | `ruff check`, `ruff format --check` | Python 3.12; pinned Ruff |
 | `test` | `pip install -e ".[dev,ml,api,tracking]"` then `pytest -q` | Synthetic fixture only — **no TLC download**; covers `/metrics` |
 | `docker` | Build `Dockerfile` via Buildx | **Does not push** the image |
-| `deploy` | WIF → GCS model → Cloud Build → Cloud Run + smoke | **Only** on push to `main` |
+| `deploy` | WIF → GCS model → Docker build/push → Cloud Run + smoke | **Only** on push to `main` |
 
 Permissions: `contents: read` for CI jobs; deploy also needs `id-token: write` for Workload Identity Federation.
 
